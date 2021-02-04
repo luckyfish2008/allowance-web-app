@@ -2,6 +2,9 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Login from '../components/Login.vue'
 import Home from '../components/Home.vue'
+import Welcome from '../components/Welcome.vue'
+import User from '../components/admin/User.vue'
+import settings from '../assets/config/settings'
 
 Vue.use(VueRouter)
 
@@ -16,7 +19,12 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/home',
-    component: Home
+    component: Home,
+    redirect: '/welcome',
+    children: [
+      { path: '/welcome', component: Welcome },
+      { path: '/user', component: User }
+    ]
   }
 ]
 
@@ -46,7 +54,7 @@ router.beforeEach((to, from, next) => {
     return next()
   }
   // 读取登录用户
-  const userFlag = window.sessionStorage.getItem('user')
+  const userFlag = localStorage.getItem(settings.LOGIN_USER_KEY)
   if (!userFlag) {
     // 无登录用户，跳转到登录页面
     return next('/login')

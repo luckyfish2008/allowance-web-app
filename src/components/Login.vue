@@ -3,7 +3,10 @@
     <div class="login_box">
       <div class="avatar_box">
         <!--头像-->
-        <img src="../assets/logo.png" alt />
+        <img
+          src="../assets/logo.png"
+          alt
+        />
       </div>
       <!--添加表单-->
       <el-form
@@ -27,8 +30,14 @@
           ></el-input>
         </el-form-item>
         <el-form-item class="btns">
-          <el-button type="primary" @click="login">登录</el-button>
-          <el-button type="info" @click="resetLoginForm">重置</el-button>
+          <el-button
+            type="primary"
+            @click="login"
+          >登录</el-button>
+          <el-button
+            type="info"
+            @click="resetLoginForm"
+          >重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -65,13 +74,16 @@ export default {
         }
         // 调用post请求,使用async await会对结果进行解析， res为请求结果的别名 {}用于解构返回结果
         const { data: res } = await this.$http.post('login', this.loginForm)
-        if (res.flag === 'ok') {
-          console.log(res.user)
-          window.sessionStorage.setItem('flag', 'ok')
-          window.sessionStorage.setItem('user', res.user)
+        if (res.code === 200) {
+          // 存储登录信息到localStorage中
+          localStorage.setItem(this.$settings.LOGIN_UUID_KEY, res.data[this.$settings.LOGIN_UUID_KEY])
+          localStorage.setItem(this.$settings.LOGIN_GH_KEY, res.data[this.$settings.LOGIN_GH_KEY])
+          localStorage.setItem(this.$settings.LOGIN_USER_KEY, JSON.stringify(res.data[this.$settings.LOGIN_USER_KEY]))
+
           this.$message.success('登录成功')
           this.$router.push({ path: '/home' })
-        } else {
+          this.$router.push({ path: '/home' })
+        } else if (res.code === 400) {
           this.$message.error('登录失败')
         }
       })
