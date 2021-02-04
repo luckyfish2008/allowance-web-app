@@ -1,47 +1,36 @@
 <template>
-  <div>
-    <div class="login_container">
-      <div class="login_box">
-        <div class="avatar_box">
-          <!--头像-->
-          <img
-            src="../assets/logo.png"
-            alt
-          />
-        </div>
-        <!--添加表单-->
-        <el-form
-          ref="loginFormRef"
-          :model="loginForm"
-          :rules="loginRules"
-          class="login_form"
-          label-width="0px"
-        >
-          <el-form-item prop="username">
-            <el-input
-              v-model="loginForm.username"
-              prefix-icon="iconfont icondenglu"
-            ></el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input
-              v-model="loginForm.password"
-              prefix-icon="iconfont iconmima"
-              type="password"
-            ></el-input>
-          </el-form-item>
-          <el-form-item class="btns">
-            <el-button
-              type="primary"
-              @click="login"
-            >登录</el-button>
-            <el-button
-              type="info"
-              @click="resetLoginForm"
-            >重置</el-button>
-          </el-form-item>
-        </el-form>
+  <div class="login_container">
+    <div class="login_box">
+      <div class="avatar_box">
+        <!--头像-->
+        <img src="../assets/logo.png" alt />
       </div>
+      <!--添加表单-->
+      <el-form
+        ref="loginFormRef"
+        :model="loginForm"
+        :rules="loginRules"
+        class="login_form"
+        label-width="0px"
+      >
+        <el-form-item prop="username">
+          <el-input
+            v-model="loginForm.username"
+            prefix-icon="iconfont icondenglu"
+          ></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="loginForm.password"
+            prefix-icon="iconfont iconmima"
+            type="password"
+          ></el-input>
+        </el-form-item>
+        <el-form-item class="btns">
+          <el-button type="primary" @click="login">登录</el-button>
+          <el-button type="info" @click="resetLoginForm">重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
@@ -74,10 +63,12 @@ export default {
         if (!valid) {
           return
         }
-        // 调用get请求 res为请求结果的别名 {}用于解构返回结果
+        // 调用post请求,使用async await会对结果进行解析， res为请求结果的别名 {}用于解构返回结果
         const { data: res } = await this.$http.post('login', this.loginForm)
-        if (res === 'ok') {
+        if (res.flag === 'ok') {
+          console.log(res.user)
           window.sessionStorage.setItem('flag', 'ok')
+          window.sessionStorage.setItem('user', res.user)
           this.$message.success('登录成功')
           this.$router.push({ path: '/home' })
         } else {
@@ -110,13 +101,13 @@ export default {
     width: 130px;
     height: 130px;
     border: 1px solid #eee;
-    border-radius: 10%; // 加圆角
-    padding: 10px;
+    border-radius: 50%; // 加圆角
+    padding: 2px;
     box-shadow: 0 0 10px #ddd; // 盒子阴影
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #c0c4cc;
+    background-color: #0ee;
     img {
       width: 100%;
       height: 100%;
