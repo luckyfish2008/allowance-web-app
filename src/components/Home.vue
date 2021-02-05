@@ -1,31 +1,27 @@
 <template>
-
   <el-container class="home-container">
     <!--头部布局-->
     <el-header>
       <div>
-        <img
-          src="../assets/logo.png"
-          alt
-          class="logo_img"
-        />
+        <img src="../assets/logo.png" alt class="logo_img" />
         <span>消耗品管理系统</span>
       </div>
-      <el-button
-        type="info"
-        @click="logout"
-      ><span style="font-size:14px;"><i class="el-icon-male"></i></span>安全退出</el-button>
+      <el-button type="info" @click="logout"
+        ><span style="font-size:14px;"><i class="el-icon-male"></i></span
+        >安全退出</el-button
+      >
     </el-header>
 
     <el-container>
       <!--侧边布局-->
-      <el-aside :width="isCollapse ?'64px':'200px'">
+      <el-aside :width="isCollapse ? '64px' : '200px'">
         <!--伸缩按钮-->
         <div
           class="toggle-button"
           @click="toggleCollapase"
+          :style="isCollapse ? 'width:64px' : 'width:200px'"
         >
-          <i :class="isCollapse?'el-icon-s-unfold':'el-icon-s-fold'"></i>
+          <i :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
         </div>
         <!--侧边栏菜单区 unique-opened="true" 只保持一个菜单展开 router开启路由 active-text-color 颜色-->
         <el-menu
@@ -39,26 +35,26 @@
           :default-active="activePath"
         >
           <el-submenu
-            :index="item.id+''"
+            :index="item.id + ''"
             v-for="item in menuList"
             :key="item.id"
           >
             <template slot="title">
               <!-- <i class="el-icon-location-information"></i> -->
               <i :class="iconsObject[item.id]"></i>
-              <span>{{item.title}}</span>
+              <span>{{ item.title }}</span>
             </template>
             <el-menu-item
               style="height:46px;line-height:46px;"
-              :index="it.path+''"
+              :index="it.path"
               v-for="it in item.slist"
               :key="it.id"
-              @click="saveNavState(it.path+'')"
+              @click="saveNavState(it.path)"
             >
               <template slot="title">
                 <!-- <i class="el-icon-location-information"></i> -->
                 <i :class="iconsObject[it.id]"></i>
-                <span>{{it.title}}</span>
+                <span>{{ it.title }}</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -90,7 +86,7 @@ export default {
         204: 'iconfont icondenglu'
       },
       isCollapse: false, // 是否折叠菜单
-      activePath: '' // 被激活的连接
+      activePath: '/welcome' // 被激活的连接
     }
   },
   // 类似onload，获取请求的菜数据
@@ -169,7 +165,7 @@ export default {
 }
 .toggle-button {
   background-color: #4a5064;
-  font-size: 18px; //设置字体大小，就可以影响到该盒子下面的图标大小
+  // font-size: 18px; //设置字体大小，就可以影响到该盒子下面的图标大小
   line-height: 24px;
   color: #fff;
   text-align: center;

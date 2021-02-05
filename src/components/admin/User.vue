@@ -1,12 +1,161 @@
 <template>
   <div>
-    user
+    <!-- 面包屑导航 -->
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>权限管理</el-breadcrumb-item>
+      <el-breadcrumb-item>用户列表</el-breadcrumb-item>
+    </el-breadcrumb>
+    <!-- 卡片视图区 -->
+    <el-card>
+      <el-row :gutter="25">
+        <el-col :span="10">
+          <!-- 搜索添加 -->
+          <el-input
+            placeholder="请输入搜索内容"
+            v-model="queryInfo.query"
+            clearable
+            @clear="getUserList"
+          >
+            <el-button
+              slot="append"
+              icon="el-icon-search"
+              @click="getUserList"
+            ></el-button>
+          </el-input>
+        </el-col>
+
+        <el-col :span="4">
+          <el-button type="primary" @click="addDialogVisible = true"
+            >添加用户</el-button
+          >
+        </el-col>
+      </el-row>
+      <!-- 用户列表 -->
+      <el-table
+        :data="userlist"
+        border
+        stripe
+        ref="mytableRef"
+        :height="tableHeight"
+      >
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="姓名" prop="username"></el-table-column>
+        <el-table-column label="邮箱" prop="email"></el-table-column>
+        <el-table-column label="密码" prop="password"></el-table-column>
+        <el-table-column label="角色" prop="role"></el-table-column>
+        <el-table-column label="状态" prop="state">
+          <!-- scope.row 就是当前行的信息 -->
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.state"
+              @change="userStateChanged(scope.row)"
+            ></el-switch>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="操作">
+          <template>
+            <!-- 修改 -->
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+            ></el-button>
+            <!-- 删除 -->
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+            ></el-button>
+            <!-- 权限 -->
+            <el-tooltip
+              effect="dark"
+              content="分配权限"
+              placement="top-start"
+              :enterable="false"
+            >
+              <el-button
+                type="warning"
+                icon="el-icon-setting"
+                size="mini"
+              ></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
+      <!-- 分页 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.pageNum"
+        :page-sizes="[1, 2, 5, 100]"
+        :page-size="queryInfo.pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
+    </el-card>
   </div>
 </template>
 <script>
 export default {
+  data () {
+    return {
+      queryInfo: {
+        query: '',
+        pageNum: 1,
+        pageSize: 5
+      },
+      tableHeight: 0,
+      userlist: [], // 用户列表
+      total: 0, // 最大数据记录
+      addDialogVisible: false // 对话框显示
+    }
+  },
+  created () {
+    this.getUserList()
 
+    this.tableHeight = 400
+  },
+  mounted () {
+    console.log('mounted')
+    this.$nextTick(function () {
+      console.log(window)
+      // alert('body.height=' + window.document.body.style.height)
+      this.tableHeight =
+        window.innerHeight - this.$refs.mytableRef.$el.offsetTop - 80
+    })
+  },
+  methods: {
+    // 查询用户数据
+    async getUserList () {
+      console.log('getUserList')
+      const { data: res } = await this.$http.get('getAllUser', {
+        params: this.queryInfo
+      })
+      console.log('res==', res)
+      if (res.code === 200) {
+        this.userlist = res.data.data
+        this.total = res.data.total
+      } else {
+        this.$message.error('查询异常！')
+      }
+    },
+    // 改变状态
+    async userStateChanged (userinfo) {
+      console.log('userStateChanged:' + userinfo)
+    },
+    // 监听pageSize改变的事件
+    handleSizeChange (newSize) {
+      this.queryInfo.pageSize = newSize
+      this.getUserList() // 数据发生改变重新申请数据
+    },
+    // 监听pageNum改变的事件
+    handleCurrentChange (newPage) {
+      this.queryInfo.pageNum = newPage
+      this.getUserList() // 数据发生改变重新申请数据
+    }
+  }
 }
 </script>
-<style scoped>
-</style>
+<style scoped></style>
