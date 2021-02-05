@@ -26,9 +26,10 @@
         </el-col>
 
         <el-col :span="4">
-          <el-button type="primary" @click="addDialogVisible = true"
-            >添加用户</el-button
-          >
+          <el-button
+            type="primary"
+            @click="showEditDialog($event)"
+          >添加用户</el-button>
         </el-col>
       </el-row>
       <!-- 用户列表 -->
@@ -40,11 +41,26 @@
         :height="tableHeight"
       >
         <el-table-column type="index"></el-table-column>
-        <el-table-column label="姓名" prop="username"></el-table-column>
-        <el-table-column label="邮箱" prop="email"></el-table-column>
-        <el-table-column label="密码" prop="password"></el-table-column>
-        <el-table-column label="角色" prop="role"></el-table-column>
-        <el-table-column label="状态" prop="state">
+        <el-table-column
+          label="姓名"
+          prop="username"
+        ></el-table-column>
+        <el-table-column
+          label="邮箱"
+          prop="email"
+        ></el-table-column>
+        <el-table-column
+          label="密码"
+          prop="password"
+        ></el-table-column>
+        <el-table-column
+          label="角色"
+          prop="role"
+        ></el-table-column>
+        <el-table-column
+          label="状态"
+          prop="state"
+        >
           <!-- scope.row 就是当前行的信息 -->
           <template slot-scope="scope">
             <el-switch
@@ -55,18 +71,20 @@
         </el-table-column>
 
         <el-table-column label="操作">
-          <template>
+          <template slot-scope="scope">
             <!-- 修改 -->
             <el-button
               type="primary"
               icon="el-icon-edit"
               size="mini"
+              @click="showEditDialog($event,scope.row.id)"
             ></el-button>
             <!-- 删除 -->
             <el-button
               type="danger"
               icon="el-icon-delete"
               size="mini"
+              @click="deleteUser(scope.row.id)"
             ></el-button>
             <!-- 权限 -->
             <el-tooltip
@@ -95,35 +113,46 @@
         :total="total"
       ></el-pagination>
     </el-card>
+
+    <!--弹框 新增/修改  试了一下也可以用标签 UserEdit 或者user-edit  -->
+    <user-edit
+      v-if="addOrUpdateVisible"
+      ref="addOrUpdateRef"
+      @refreshDataList="getUserList"
+    >
+    </user-edit>
   </div>
 </template>
 <script>
+// 导入增加修改页面组件
+import UserEdit from './UserEdit.vue'
 export default {
+  // 注册增加修改页面组件
+  components: { UserEdit },
+  // 数据
   data () {
     return {
+      // 查询数据
       queryInfo: {
         query: '',
         pageNum: 1,
         pageSize: 5
       },
-      tableHeight: 0,
+      tableHeight: 0, // 表格高度
       userlist: [], // 用户列表
       total: 0, // 最大数据记录
-      addDialogVisible: false // 对话框显示
+      addOrUpdateVisible: false // 新增/修改界面是否显示
     }
   },
   created () {
     this.getUserList()
-
-    this.tableHeight = 400
   },
   mounted () {
     console.log('mounted')
     this.$nextTick(function () {
       console.log(window)
       // alert('body.height=' + window.document.body.style.height)
-      this.tableHeight =
-        window.innerHeight - this.$refs.mytableRef.$el.offsetTop - 80
+      this.tableHeight = window.innerHeight - this.$refs.mytableRef.$el.offsetTop - 80
     })
   },
   methods: {
@@ -154,6 +183,19 @@ export default {
     handleCurrentChange (newPage) {
       this.queryInfo.pageNum = newPage
       this.getUserList() // 数据发生改变重新申请数据
+    },
+    // 新增修改页面
+    showEditDialog (event, id) {
+      // 显示组件
+      this.addOrUpdateVisible = true
+      // 调用初始化方法
+      this.$nextTick(() => {
+        this.$refs.addOrUpdateRef.init(id)
+      })
+    },
+    // 删除
+    deleteUser (id) {
+      console.log(id)
     }
   }
 }

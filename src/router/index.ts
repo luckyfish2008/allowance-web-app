@@ -1,9 +1,14 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
+// 登录页面
 import Login from '../components/Login.vue'
+// 主页面
 import Home from '../components/Home.vue'
+// 欢迎页面
 import Welcome from '../components/Welcome.vue'
+// 用户列表页面
 import User from '../components/admin/User.vue'
+// 系统参数配置文件
 import settings from '../assets/config/settings'
 
 Vue.use(VueRouter)
