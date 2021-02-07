@@ -20,14 +20,14 @@
           <el-input
             v-model="loginForm.username"
             prefix-icon="iconfont icondenglu"
-          ></el-input>
+          ><template slot="prepend">帐号</template></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input
             v-model="loginForm.password"
             prefix-icon="iconfont iconmima"
             type="password"
-          ></el-input>
+          ><template slot="prepend">密码</template></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button
