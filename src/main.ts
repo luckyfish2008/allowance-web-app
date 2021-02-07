@@ -25,7 +25,7 @@ axios.defaults.baseURL = settings.REMOTE_URL
 
 // 统一处理请求
 axios.interceptors.request.use(config => {
-  console.log(config)
+  // console.log(config)
   // 请求头挂载信息 将服务器端返回的uuid gh放入请求头
   config.headers[settings.LOGIN_UUID_KEY] = localStorage.getItem(
     settings.LOGIN_UUID_KEY
@@ -41,12 +41,27 @@ axios.interceptors.request.use(config => {
 axios.interceptors.response.use(function (res) {
   if (res.data.code === 10000) {
     // 登录过期
-    ElementUI.Message.error('登录过期，请重新登录!')
-    router.push('/login')
+    // ElementUI.Message.error('登录过期，请重新登录!')
+    // router.push('/login')
+    ElementUI.MessageBox({
+      title: '提示信息',
+      message: '登录过期，请重新登录',
+      type: 'error',
+      callback: function (action, instance) {
+        if (action === 'confirm') {
+          router.push('/login')
+        }
+      }
+    })
   }
   if (res.data.code === 10001) {
     // 统一异常提示
-    ElementUI.Message.error(res.data.msg)
+    // ElementUI.Message.error(res.data.msg)
+    ElementUI.MessageBox({
+      title: '提示信息',
+      message: '登录过期',
+      type: 'error'
+    })
   }
   return res
 })

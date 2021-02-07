@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height:100%">
     <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
@@ -26,10 +26,9 @@
         </el-col>
 
         <el-col :span="4">
-          <el-button
-            type="primary"
-            @click="showEditDialog($event)"
-          >添加用户</el-button>
+          <el-button type="primary" @click="showEditDialog($event)"
+            >添加用户</el-button
+          >
         </el-col>
       </el-row>
       <!-- 用户列表 -->
@@ -37,30 +36,29 @@
         :data="userlist"
         border
         stripe
+        size="medium"
         ref="mytableRef"
         :height="tableHeight"
+        :header-cell-style="{ 'text-align': 'center' }"
       >
         <el-table-column type="index"></el-table-column>
         <el-table-column
           label="姓名"
           prop="username"
+          width="200"
         ></el-table-column>
         <el-table-column
           label="邮箱"
           prop="email"
+          width="200"
         ></el-table-column>
         <el-table-column
           label="密码"
           prop="password"
+          width="200"
         ></el-table-column>
-        <el-table-column
-          label="角色"
-          prop="role"
-        ></el-table-column>
-        <el-table-column
-          label="状态"
-          prop="state"
-        >
+        <el-table-column label="角色" prop="role" width="200"></el-table-column>
+        <el-table-column label="状态" prop="state" width="100">
           <!-- scope.row 就是当前行的信息 -->
           <template slot-scope="scope">
             <el-switch
@@ -77,7 +75,7 @@
               type="primary"
               icon="el-icon-edit"
               size="mini"
-              @click="showEditDialog($event,scope.row.id)"
+              @click="showEditDialog($event, scope.row.id)"
             ></el-button>
             <!-- 删除 -->
             <el-button
@@ -136,7 +134,7 @@ export default {
       queryInfo: {
         query: '',
         pageNum: 1,
-        pageSize: 5
+        pageSize: 100
       },
       tableHeight: 0, // 表格高度
       userlist: [], // 用户列表
@@ -148,21 +146,27 @@ export default {
     this.getUserList()
   },
   mounted () {
-    console.log('mounted')
+    // console.log('mounted')
     this.$nextTick(function () {
+      /*
       console.log(window)
-      // alert('body.height=' + window.document.body.style.height)
-      this.tableHeight = window.innerHeight - this.$refs.mytableRef.$el.offsetTop - 80
+      console.log(
+        this.$refs.mytableRef.$el.parentElement.parentElement.parentElement
+          .offsetHeight,
+        this.$refs.mytableRef.$el.topElement
+      )
+      */
+      this.tableHeight =
+        window.innerHeight - this.$refs.mytableRef.$el.offsetTop - 80
     })
   },
   methods: {
     // 查询用户数据
     async getUserList () {
-      console.log('getUserList')
+      // console.log('getUserList')
       const { data: res } = await this.$http.get('getAllUser', {
         params: this.queryInfo
       })
-      console.log('res==', res)
       if (res.code === 200) {
         this.userlist = res.data.data
         this.total = res.data.total
@@ -171,8 +175,29 @@ export default {
       }
     },
     // 改变状态
-    async userStateChanged (userinfo) {
-      console.log('userStateChanged:' + userinfo)
+    async userStateChanged (userInfo) {
+      const confirmResult = await this.$confirm(
+        '修改用户状态, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+
+      if (confirmResult !== 'confirm') {
+        userInfo.state = !userInfo.state // 撤回原来的状态
+        return this.$message.info('已取消')
+      }
+      // 提交到后台进行修改状态
+      const { data: res } = await this.$http.put(
+        `updateState?id=${userInfo.id}&state=${userInfo.state}`
+      )
+      if (res.code !== 200) {
+        this.$message.error('状态修改失败！')
+      }
+      this.$message.success('状态修改成功！')
     },
     // 监听pageSize改变的事件
     handleSizeChange (newSize) {
@@ -194,8 +219,26 @@ export default {
       })
     },
     // 删除
-    deleteUser (id) {
-      console.log(id)
+    async deleteUser (id) {
+      const confirmResult = await this.$confirm(
+        '用户将被永久删除,确定删除吗?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+      }
+      const { data: res } = await this.$http.delete('deleteUser?id=' + id)
+      if (res.code !== 200) {
+        return this.$message.error('删除失败')
+      }
+      this.$message.success('删除成功')
+      this.getUserList()
     }
   }
 }

@@ -42,10 +42,12 @@ const router = new VueRouter({
 /*
 // 有时候路由有问题，会跳不走，解决这个bug
 const originalPush = VueRouter.prototype.push
-VueRouter.prototype.push = function push (location, onResolve, onReject) {
+// eslint-disable-next-line
+VueRouter.prototype.push = function push(location, onResolve, onReject) {
   if (onResolve || onReject) {
     return originalPush.call(this, location, onResolve, onReject)
   }
+  // eslint-disable-next-line
   return originalPush.call(this, location).catch(err => err)
 }
 */
